@@ -1,4 +1,5 @@
 const Koa = require('koa')
+const fs = require('fs')
 const app = new Koa()
 
 // x-response-time
@@ -18,9 +19,10 @@ app.use(async (ctx, next) => {
 })
 
 // response
-app.use(ctx => {
-  console.log(ctx)
-  ctx.body = 'Hello World2'
+app.use(async ctx => {
+  // ctx.body = 'Hello World'
+  ctx.attachment('w3.jpg')
+  ctx.body = fs.createReadStream('public/w3.jpg')
 })
 
-app.listen(3001)
+app.listen(3000)
