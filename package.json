@@ -1,0 +1,14 @@
+{
+  "name": "koaserver",
+  "version": "1.0.0",
+  "description": "koa learn project",
+  "main": "koaapp.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.5.0"
+  }
+}
