@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>koa-learn</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    html,body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    a {
+      text-decoration: none;
+      color: #999;
+    }
+    a:hover {
+      color: #666666;
+    }
+    .main {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .main img {
+      width: 75%;
+      max-width: 500px;
+      margin-bottom: 70px;
+      border-radius: 50%;
+      animation: slideFromTop 1s;
+    }
+    @keyframes slideFromTop {
+      from {
+        opacity: 0;
+        transform: translateY(-100%);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body>
+  <div class="main">
+    <img src="./w3.jpg" alt="w3">
+    <h1><a href="https://github.com/huajianduzhuo/koa-learn">Koa Learn</a></h1>
+  </div>
+  <canvas id="canvas"></canvas>
+</body>
+<script src="https://raw.githack.com/huajianduzhuo/txjg/master/src/js/texiao.js"></script>
+</html>
