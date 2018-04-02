@@ -16,7 +16,9 @@ app.listen(3000)
 
 koa 通过 app.use(middlewareCallback) 使用中间件，中间件回调函数接收（ctx, next）参数。
   * ctx: 上下文对象
-  * next: 调用 next 函数，则当前中间件暂停执行，继续执行下一个中间件，当下游没有中间件执行时，回复执行上游中间件
+  * next: 调用 next 函数，则当前中间件暂停执行，继续执行下一个中间件，当下游没有中间件执行时，恢复执行上游中间件
+
+> 不调用 next 函数，则后面的中间件不会执行
 
 ```javascript
 // x-response-time
@@ -286,4 +288,125 @@ app.use(async ctx => {
   ctx.attachment('w3.jpg')
   ctx.body = fs.createReadStream('public/w3.jpg')
 })
+```
+
+# 错误处理
+
+## 服务器错误（500）
+
+```javascript
+app.use((ctx, next) => {
+  ctx.throw(500, 'throw 500') // 错误信息 throw 500 会显示在后台控制台
+})
+```
+
+## 404错误
+
+将 `ctx.response.status` 设置成 404，就相当于 `ctx.throw(404)`，返回 404 错误
+
+```javascript
+app.use((ctx, next) => {
+  ctx.status = 404
+  ctx.body = 'this is 404 page'
+})
+```
+
+## 处理错误的中间件
+
+使用 `try...catch` 捕获错误，可以在最外层的中间件，使用 `try...catch`，负责所有中间件的错误处理
+
+```javascript
+// 错误处理中间件
+app.use(async (ctx, next) => {
+  try {
+    await next()
+  } catch (error) {
+    ctx.status = error.statusCode || error.status || 500
+    ctx.body = {message: error.message}
+  }
+})
+
+app.use(ctx => {
+  ctx.throw(500)
+})
+```
+
+## error 事件监听
+
+运行过程中一旦出错，Koa 会触发一个 `error` 事件。监听这个事件，也可以处理错误
+
+```javascript
+app.use((ctx, next) => {
+  ctx.throw(500)
+})
+
+app.on('error', (error, ctx) => {
+  console.log('server error listener', error)
+})
+```
+
+## 释放 error 事件
+
+如果错误被 `try...catch` 捕获，就**不会触发** `error` 事件。这时，必须调用 `ctx.app.emit()`，手动释放 error 事件，才能让监听函数生效。
+
+```javascript
+// 处理错误的中间件
+app.use(async (ctx, next) => {
+  try {
+    await next()
+  } catch (error) {
+    ctx.status = error.statusCode || error.status || 500
+    ctx.type = 'html'
+    ctx.body = '<p style="color: red;">Something wrong, please contact administrator</p>'
+    ctx.app.emit('error', error, ctx) // 释放 error 事件
+  }
+})
+
+app.use(ctx => {
+  ctx.throw(500)
+})
+
+app.on('error', (error, ctx) => {
+  console.log('logging error: ' + error.message)
+  console.log(error)
+})
+```
+
+# 路由
+
+## 原生路由
+
+网站一般都有多个页面。通过 `ctx.request.path` 可以获取用户请求的路径，由此实现简单的路由。
+
+## koa-route
+
+使用 `koa-route` 模块
+
+```javascript
+const route = require('koa-route')
+
+const main = ctx => {
+  ctx.body = 'Hello World'
+}
+const about = ctx => {
+  ctx.type = 'html'
+  ctx.body = 'ABOUT<br><a href="/">MAIN</a>'
+}
+
+app.use(route.get('/', main))
+app.use(route.get('/about', about))
+```
+
+## 静态资源
+
+如果网站提供静态资源（图片、字体、样式表、脚本......），为它们一个个写路由就很麻烦，也没必要。`koa-static` 模块封装了这部分的请求
+
+运行如下代码，访问 `http://localhost:3000/`，就可看到 `public` 目录下的 `index.html` 页面
+
+```javascript
+const path = require('path')
+const serve = require('koa-static')
+
+const main = serve(path.join(__dirname, '../public'))
+app.use(main)
 ```
