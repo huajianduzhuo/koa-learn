@@ -410,3 +410,17 @@ const serve = require('koa-static')
 const main = serve(path.join(__dirname, '../public'))
 app.use(main)
 ```
+
+# Cookie
+
+参考上面的 Context API，可以通过 `ctx.cookies` 来读写 Cookie
+
+> 运行 13-cookies.js 发现，页面数字变化不是 1 2 3 4...，而是 1 3 5...，是因为浏览器每次会请求 favicon.ico
+
+```javascript
+app.use((ctx, next) => {
+  let views = Number(ctx.cookies.get('view') || 0) + 1
+  ctx.cookies.set('view', views)
+  ctx.body = views + ' view'
+})
+```
