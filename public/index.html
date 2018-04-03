@@ -46,6 +46,14 @@
         transform: translateY(0);
       }
     }
+    .socket {
+      position: fixed;
+      top: 40px;
+      right: 30px;
+      color: #999999;
+      cursor: pointer;
+      font-size: 18px;
+    }
     canvas {
       position: absolute;
       top: 0;
@@ -59,7 +67,22 @@
     <img src="./w3.jpg" alt="w3">
     <h1><a href="https://github.com/huajianduzhuo/koa-learn">Koa Learn</a></h1>
   </div>
+  <div class="socket" onclick="createSocketServer()">Create WebSocket Server</div>
   <canvas id="canvas"></canvas>
 </body>
 <script src="https://raw.githack.com/huajianduzhuo/txjg/master/src/js/texiao.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script>
+  let socket
+  function createSocketServer() {
+    if (socket) {
+      alert('you have created a connection')
+    } else {
+      socket = io.connect(`${location.protocol}//${location.host}`)
+      socket.on('success', data => {
+        alert(data)
+      })
+    }
+  }
+</script>
 </html>
