@@ -1,32 +1,5 @@
 const mysql = require('mysql')
 
-/* const connection  = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '1234',
-  database: 'myjdb'
-})
-
-connection.connect(err => {
-  if (err) {
-    console.log('=================FAIL=================')
-    console.log('database connect failed!!!', err)
-    console.log('======================================')
-    return
-  }
-  console.log('================SUCCESS=================')
-  console.log('database connect success!!! ' + connection.threadId)
-  console.log('========================================')
-})
-
-connection.query('select * from test1', (err, result) => {
-  if (!err) {
-    console.log(result)
-  } else {
-    console.log(err)
-  }
-}) */
-
 const pool = mysql.createPool({
   connectionLimit: 1,
   host: 'localhost',
@@ -84,40 +57,8 @@ pool.on('release', connection => {
   console.log('connection %d released', connection.threadId)
 })
 
-pool.getConnection((err, connection) => {
-  if (err) {
-    throw err
-  } else {
-    connection.query('select * from test1 where name = ?', '沈巍', (err, results) => {
-      connection.release()
-      if (!err) {
-        console.log(results)
-      } else {
-        console.log(err)
-      }
-    })
-  }
+pool.on('error', error => {
+  console.error(error, 'sql failed: ' + error.sql)
 })
 
-/** 
- * mysql.format(sql, values)
- * 内部会 escape 传入的值，防止 sql 注入攻击
- */
-pool.getConnection((err, connection) => {
-  if (err) {
-    throw err
-  } else {
-    let sql = 'select ?? from ?? where date = ?'
-    const inserts = ['name', 'test1', new Date('2018-7-19')]
-    sql = mysql.format(sql, inserts)
-    connection.query(sql, (err, results, fields) => {
-      connection.release()
-      if (!err) {
-        console.log(results)
-        // console.log(fields)
-      } else {
-        console.log(err)
-      }
-    })
-  }
-})
+export default {mysql, pool}
