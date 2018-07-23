@@ -61,4 +61,4 @@ pool.on('error', error => {
   console.error(error, 'sql failed: ' + error.sql)
 })
 
-export default {mysql, pool}
+module.exports = {mysql, pool}

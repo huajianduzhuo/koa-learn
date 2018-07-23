@@ -20,4 +20,6 @@ app
   .use(router.routes())
   .use(router.allowedMethods())
 
-app.listen(3000)
+app.listen(3000, () => {
+  console.log(`the server is running at "http://localhost:3000/"`)
+})
